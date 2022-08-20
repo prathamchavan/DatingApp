@@ -27,7 +27,7 @@ namespace API
         }
 
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DataContext>(options =>
@@ -35,18 +35,17 @@ namespace API
                 options.UseSqlite(_config.GetConnectionString("DefaultConnection"));
             });
             services.AddControllers();
+            services.AddCors();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPIv5", Version = "v1" });
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        //This method is called by the runtime. Use this method to configure the HTTP request 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            //Here er check if we are in developement mode or not.
-            //And if we are and our application encounters a problem
-            //then we use the developer exception page.
+            
 
             if (env.IsDevelopment())
             {
@@ -55,21 +54,18 @@ namespace API
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPIv5 v1"));
             }
 
-            //if we did come in on HTTP address, then we get directed to the HTTPS endpoints.
-
+        
             app.UseHttpsRedirection();
-
-            //due to routing we are able to go through our browser and get to our weatherforcast controller
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200"));
 
-            //we have the middleware to actually use the endpoint
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
-                //method to map the controllers();
+                
                 endpoints.MapControllers();
             });
         }
